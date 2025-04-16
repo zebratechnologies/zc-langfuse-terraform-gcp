@@ -24,7 +24,7 @@ This module aims to provide a production-ready, secure, and scalable deployment 
 
 ```hcl
 module "langfuse" {
-  source = "github.com/langfuse/langfuse-terraform-gcp?ref=v0.1.0"
+  source = "github.com/langfuse/langfuse-terraform-gcp?ref=0.1.0"
 
   domain = "langfuse.example.com"
   
@@ -34,6 +34,20 @@ module "langfuse" {
   
   # Optional: Configure the VPC
   subnetwork_cidr = "10.0.0.0/16"
+}
+
+provider "kubernetes" {
+  host                   = module.langfuse.cluster_host
+  cluster_ca_certificate = module.langfuse.cluster_ca_certificate
+  token                  = module.langfuse.cluster_token
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = module.langfuse.cluster_host
+    cluster_ca_certificate = module.langfuse.cluster_ca_certificate
+    token                  = module.langfuse.cluster_token
+  }
 }
 ```
 
