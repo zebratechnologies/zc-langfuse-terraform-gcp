@@ -8,6 +8,9 @@
 This repository contains a Terraform module for deploying [Langfuse](https://langfuse.com/) - the open-source LLM observability platform - on GCP.
 This module aims to provide a production-ready, secure, and scalable deployment using managed services whenever possible.
 
+![gcp-architecture](https://github.com/user-attachments/assets/a8fb739f-1757-451e-9808-e77ebfa2d334)
+
+
 ## Usage
 
 1. Enable required APIs on your Google Cloud Account:
