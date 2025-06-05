@@ -35,7 +35,7 @@ resource "google_sql_database" "langfuse" {
 resource "google_sql_user" "langfuse" {
   name     = "langfuse"
   instance = google_sql_database_instance.this.name
-  password = random_password.postgres_password.result
+  password_wo = random_password.postgres_password.result
 }
 
 # Random passwords for database credentials
