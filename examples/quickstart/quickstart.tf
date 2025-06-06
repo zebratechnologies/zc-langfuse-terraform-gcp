@@ -66,3 +66,8 @@ provider "helm" {
     token                  = module.langfuse.cluster_token
   }
 }
+
+output "connect" {
+  description = "The cluster connection string to use once Terraform apply finishes"
+  value       = "gcloud container clusters get-credentials ${module.langfuse.cluster_name} --zone us-east1 --project zac-02-d"
+}

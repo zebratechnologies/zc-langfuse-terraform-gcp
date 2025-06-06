@@ -9,13 +9,26 @@ locals {
 resource "google_container_cluster" "this" {
   name     = var.name
   location = data.google_client_config.current.region
+  remove_default_node_pool = true
 
   # Enable Workload Identity
   workload_identity_config {
     workload_pool = "${data.google_client_config.current.project}.svc.id.goog"
   }
 
-#  enable_autopilot = true
+  cluster_autoscaling {
+    enabled = true
+    resource_limits {
+      resource_type = "cpu"
+      minimum = 0
+      maximum = 64
+    }
+    resource_limits {
+      resource_type = "memory"
+      minimum = 0
+      maximum = 64
+    }
+  }
 
   dynamic "private_cluster_config" {
     for_each = local.enable_private_cluster_config ? [{
