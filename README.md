@@ -1,3 +1,83 @@
+# Zebra specific changes
+## Create a GCS bucket that is unique in the GCP project
+```bash
+gcloud storage buckets create gs://zc_langfuse_tf/ --uniform-bucket-level-access --project=zac-02-d
+```
+
+## Get remote tfstate
+```bash
+ terraform init -backend-config=bucket=zc_langfuse_tf
+```
+
+## Create
+```bash
+terraform apply --target module.langfuse.google_dns_managed_zone.this --target module.langfuse.google_container_cluster.this
+```
+
+After a few minutes 4 resources were created
+
+```bash
+terraform apply
+```
+
+This might take 15-20 minutes and you are going to get an error
+> Error: kubernetes_namespace.langfuse.metadata[0].name/https-redirect failed to create kubernetes rest client for update of resource: Get "https://34.73.202.91/api?timeout=32s": net/http: TLS handshake timeout
+>   with module.langfuse.kubectl_manifest.https_redirect_new,
+>   on ../../tls.tf line 29, in resource "kubectl_manifest" "https_redirect_new":
+>   29: resource "kubectl_manifest" "https_redirect_new" {
+
+This is because it is trying to connect to the newly created GKE cluster but was not updated. You should also see this output below to configure your connection to the GKE cluster
+
+> Outputs:
+
+> connect = "gcloud container clusters get-credentials langfuse --zone us-east1 --project zac-02-d"
+
+perform the command above and then
+```bash
+terraform apply
+```
+
+## Destroy
+```bash
+terraform destroy
+```
+After a few minutes you might see the following errors.
+
+>  Error: Error when reading or editing ManagedSslCertificate: googleapi: Error 400: The ssl_certificate resource 'projects/zac-02-d/global/sslCertificates/langfuse' is already being used by 'projects/zac-02-d/global/targetHttpsProxies/k8s2-ts-9rqadjbr-langfuse-langfuse-193gzud3', resourceInUseByAnotherResource
+
+>  Error: Error when reading or editing Database: googleapi: Error 400: Invalid request: failed to delete database langfuse. Detail: pq: database "langfuse" is being accessed by other users., invalid
+
+>  Error: Error, failed to deleteuser langfuse in instance langfuse: googleapi: Error 400: Invalid request: failed to delete user langfuse: . role "langfuse" cannot be dropped because some objects depend on it Details: 67 objects in database langfuse., invalid
+
+Run again
+```bash
+terraform destroy
+```
+You might get a different error
+
+> Error: Error, failed to deleteuser langfuse in instance langfuse: googleapi: Error 400: Invalid request: failed to delete user langfuse: . role "langfuse" cannot be dropped because some objects depend on it Details: 67 objects in database langfuse., invalid
+
+Run again
+```bash
+terraform destroy
+```
+
+You will get probably this error
+> Error: Unable to remove Service Networking Connection, err: Error waiting for Delete Service Networking Connection: Error code 9, message: Failed to delete connection; Producer services (e.g. CloudSQL, Cloud Memstore, etc.) are still using this connection.
+> Help Token: AeNz4Ph1sf8XAHiAXAbszZid992DLQZQhc5XdYF1feu9OV_kpp1u5shzDTEfiRH-5BRQtOhLniXL_br5vlTcGEsEMA6UxmDfYAv899fSyjjAvRiH
+
+This error can only be fixed by going to the GCP Console of the project that was used to create the instance.
+1. Go VPC Network
+2. Go to VPC network peering
+3. Select the resource that has "langfuse" as VPC network and Delete
+
+Run again
+```bash
+terraform destroy
+```
+
+This should result in ALL resources been destroyed
+
 ![GitHub Banner](https://github.com/langfuse/langfuse-k8s/assets/2834609/2982b65d-d0bc-4954-82ff-af8da3a4fac8)
 
 # GCP Langfuse Terraform module

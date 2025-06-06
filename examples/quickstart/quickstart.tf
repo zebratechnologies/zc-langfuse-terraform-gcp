@@ -1,14 +1,31 @@
+terraform {
+  backend "gcs" {
+    prefix = "states"
+  }
+}
+
+provider "google" {
+  # Change this according to project name, and region required.
+  project = "zac-02-d"
+  region = "us-east1"
+}
+
 module "langfuse" {
   source = "../.."
 
-  domain = "langfuse.example.com"
+  apex_domain_gcp_project = "cto-eva-cust-domain-poc-10"
+
+  domain =  "lf-prod.cto-si.zebra.com"
+  apex_domain = "cto-si.zebra.com"
+  subdomain = "lf-prod"
+  apex_domain_integration_enabled = true
 
   # Optional use a different name for your installation
   # e.g. when using the module multiple times on the same GCP account
   name = "langfuse"
 
   # Optional: Configure the Subnetwork
-  subnetwork_cidr = "10.0.0.0/16"
+  subnetwork_cidr = "10.110.0.0/16"
 
   # Optional: Configure the Kubernetes cluster
   kubernetes_namespace = "langfuse"
@@ -24,6 +41,16 @@ module "langfuse" {
 
   # Optional: Configure the Langfuse Helm chart version
   langfuse_chart_version = "1.2.15"
+
+  ip_range_pods                        = "10.120.0.0/16"
+  ip_range_services                    = "10.130.0.0/16"
+  master_ipv4_cidr_block = "10.0.0.0/28"
+
+  initial_cluster_node_count = 3
+  initial_primary_node_pool_node_count =  1
+  enable_private_nodes = true
+
+  deletion_protection = false
 }
 
 provider "kubernetes" {
@@ -38,4 +65,9 @@ provider "helm" {
     cluster_ca_certificate = module.langfuse.cluster_ca_certificate
     token                  = module.langfuse.cluster_token
   }
+}
+
+output "connect" {
+  description = "The cluster connection string to use once Terraform apply finishes"
+  value       = "gcloud container clusters get-credentials ${module.langfuse.cluster_name} --zone us-east1 --project zac-02-d"
 }
