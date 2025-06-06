@@ -17,7 +17,7 @@ module "langfuse" {
 
   domain =  "lf-prod.cto-si.zebra.com"
   apex_domain = "cto-si.zebra.com"
-  subdomain = "lf.prod"
+  subdomain = "lf-prod"
   apex_domain_integration_enabled = true
 
   # Optional use a different name for your installation

@@ -31,6 +31,8 @@ resource "google_dns_record_set" "this" {
   ttl          = 300
 
   rrdatas = [data.kubernetes_ingress_v1.langfuse.status.0.load_balancer.0.ingress.0.ip]
+
+  depends_on   = [google_dns_managed_zone.this]
 }
 
 resource "google_dns_record_set" "externaldns_record_set_with_sub" {
