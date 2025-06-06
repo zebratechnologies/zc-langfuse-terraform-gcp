@@ -17,6 +17,7 @@ resource "kubernetes_manifest" "https_redirect" {
       "namespace" = kubernetes_namespace.langfuse.metadata[0].name
     }
     "spec" = {
+      "sslPolicy" = "zebra-ssl-policy-tls-1-1-custom"
       "redirectToHttps" = {
         enabled          = "true"
         responseCodeName = "PERMANENT_REDIRECT"
