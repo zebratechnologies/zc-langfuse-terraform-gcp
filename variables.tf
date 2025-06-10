@@ -69,6 +69,7 @@ variable "langfuse_chart_version" {
   default     = "1.2.15"
 }
 
+#Zebra additions
 variable "apex_domain_gcp_project" {
   description = "The GCP project the parent domain is managed by, used to write recordsets for a subdomain if set.  Defaults to current project."
   type        = string
