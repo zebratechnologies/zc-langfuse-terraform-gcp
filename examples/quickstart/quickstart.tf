@@ -20,6 +20,10 @@ resource "google_project_iam_member" "tiger-devs-container-developer" {
   member             = "group:gcds-tiger-devs@zebra.com"
 }
 
+data "google_service_account" "zc-tiger-sa" {
+  account_id   = "zac-tiger-sa"
+}
+
 module "langfuse" {
   source = "../.."
 
