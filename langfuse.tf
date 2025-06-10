@@ -93,6 +93,13 @@ langfuse:
       name: ${kubernetes_secret.langfuse.metadata[0].name}
       key: encryption_key
 EOT
+  service_values    = <<EOT
+langfuse:
+  web:
+    service:
+      annotations:
+        cloud.google.com/backend-config: '{"default": "iap-config"}'
+EOT
 }
 
 # Service account for workload identity
@@ -162,6 +169,7 @@ resource "helm_release" "langfuse" {
     local.langfuse_values,
     local.ingress_values,
     local.encryption_values,
+    local.service_values,
   ]
 
   depends_on = [
@@ -170,4 +178,24 @@ resource "helm_release" "langfuse" {
   ]
 
   timeout = 1800 # Increase timeout to 15 minutes
+}
+
+data "google_secret_manager_secret" "zc-iap-oauth-client-secret" {
+  secret_id = "zc-iap-oauth-client"
+}
+
+data "google_secret_manager_secret_version" "zc-iap-oauth-client-secret-basic" {
+  secret      = data.google_secret_manager_secret.zc-iap-oauth-client-secret.id
+}
+
+resource "kubernetes_secret" "zc-iap-oauth-client" {
+  metadata {
+    name      = "zc-iap-oauth-client"
+    namespace = kubernetes_namespace.langfuse.metadata[0].name
+  }
+
+  data = {
+    "client_id"      = jsondecode(data.google_secret_manager_secret_version.zc-iap-oauth-client-secret-basic.secret_data).client_id
+    "client_secret"   = jsondecode(data.google_secret_manager_secret_version.zc-iap-oauth-client-secret-basic.secret_data).client_secret
+  }
 }

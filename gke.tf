@@ -64,3 +64,22 @@ resource "google_container_cluster" "this" {
 
   deletion_protection = var.deletion_protection
 }
+
+resource "kubectl_manifest" "enable_iap" {
+  yaml_body = <<YAML
+    apiVersion: cloud.google.com/v1
+    kind: BackendConfig
+    metadata:
+      name:  iap-config
+      namespace: ${kubernetes_namespace.langfuse.metadata[0].name}
+    spec:
+      timeoutSec: 60
+      customResponseHeaders:
+        headers:
+          - "Strict-Transport-Security: max-age=63072000; includeSubDomains"
+      iap:
+        enabled:  true
+        oauthclientCredentials:
+          secretName: zc-iap-oauth-client
+  YAML
+}
