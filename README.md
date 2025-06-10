@@ -1,4 +1,12 @@
 # Zebra specific changes
+## Requirements to run this Terraform script
+* user needs access to register the newly created DNS with apex_domain_gcp_project = "cto-eva-cust-domain-poc-10"
+* If running this on the same GCP project as a production environment then make sure that the IAP client credentials are created (see command below)
+
+```bash
+open https://github.com/zebratechnologies/zc-jx-tf-gke.prod/blob/1ce5b7e128a07d41c93ac6e76c2a841ac76febfe/main.tf#L116
+```
+
 ## Create a GCS bucket that is unique in the GCP project
 ```bash
 gcloud storage buckets create gs://zc_langfuse_tf/ --uniform-bucket-level-access --project=zac-02-d
