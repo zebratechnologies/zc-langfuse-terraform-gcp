@@ -7,6 +7,11 @@
 open https://github.com/zebratechnologies/zc-jx-tf-gke.prod/blob/1ce5b7e128a07d41c93ac6e76c2a841ac76febfe/main.tf#L116
 ```
 
+* user needs to make sure that the tiger-sa Google Service Account was previously created (for now we are referencing the one from the dev environment)
+```bash
+open https://github.com/zebratechnologies/zac-jx3-tf-gke.dev/blob/2f6c2966989e522efa0fcabae977c20b5f22800f/main.tf#L759
+```
+
 ## Create a GCS bucket that is unique in the GCP project
 ```bash
 gcloud storage buckets create gs://zc_langfuse_tf/ --uniform-bucket-level-access --project=zac-02-d

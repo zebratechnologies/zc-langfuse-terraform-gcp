@@ -6,6 +6,7 @@ terraform {
 
 locals {
   gcp_project = "zac-02-d"
+  dev_gcp_project = "zac-01-pp-d"
 }
 
 provider "google" {
@@ -18,6 +19,17 @@ resource "google_project_iam_member" "tiger-devs-container-developer" {
   project = local.gcp_project
   role               = "roles/container.developer"
   member             = "group:gcds-tiger-devs@zebra.com"
+}
+
+data "google_service_account" "zc-tiger-sa" {
+  project = local.dev_gcp_project
+  account_id   = "zac-tiger-sa"
+}
+
+resource "google_iap_web_iam_member" "zc-group-iap-binding" {
+  project = local.gcp_project
+  role = "roles/iap.httpsResourceAccessor"
+  member = "serviceAccount:${data.google_service_account.zc-tiger-sa.email}"
 }
 
 module "langfuse" {
