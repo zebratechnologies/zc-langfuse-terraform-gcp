@@ -4,10 +4,20 @@ terraform {
   }
 }
 
+locals {
+  gcp_project = "zac-02-d"
+}
+
 provider "google" {
   # Change this according to project name, and region required.
-  project = "zac-02-d"
+  project = local.gcp_project
   region = "us-east1"
+}
+
+resource "google_project_iam_member" "tiger-devs-container-developer" {
+  project = local.gcp_project
+  role               = "roles/container.developer"
+  member             = "group:gcds-tiger-devs@zebra.com"
 }
 
 module "langfuse" {
